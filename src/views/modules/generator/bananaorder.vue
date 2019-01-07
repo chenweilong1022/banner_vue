@@ -5,6 +5,16 @@
         <el-input v-model="dataForm.key" placeholder="参数名" clearable></el-input>
       </el-form-item>
       <el-form-item>
+        <el-select v-model="dataForm.topUpWay" placeholder="请选择">
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value">
+          </el-option>
+        </el-select>
+      </el-form-item>
+      <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('generator:bananaorder:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
@@ -121,8 +131,19 @@
     data () {
       return {
         dataForm: {
-          key: ''
+          key: '',
+          topUpWay: ''
         },
+        options: [{
+          value: 1,
+          label: '卡密'
+        }, {
+          value: 2,
+          label: '自动充值'
+        }, {
+          value: 3,
+          label: '手动充值'
+        }],
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -148,7 +169,8 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'key': this.dataForm.key
+            'key': this.dataForm.key,
+            'topUpWay': this.dataForm.topUpWay
           })
         }).then(({data}) => {
           if (data && data.code === 0) {

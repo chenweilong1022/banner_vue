@@ -39,7 +39,7 @@
     },
     mounted () {
       this.ue = ueditor.getEditor(this.ueId, {
-        // serverUrl: '', // 服务器统一请求接口路径
+        serverUrl: this.$http.adornUrl(`/file/config?token=${this.$cookie.get('token')}`),
         zIndex: 3000
       })
     },

@@ -5,7 +5,7 @@
   "author": "daxiong.yang <daxiong.yang@qq.com>",
   "private": true,
   "scripts": {
-    "dev": "HOST='123.207.37.241' webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
+    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
     "unit": "jest --config test/unit/jest.conf.js --coverage",
     "e2e": "node test/e2e/runner.js",
@@ -29,6 +29,8 @@
     "svg-sprite-loader": "3.7.3",
     "vue": "2.5.2",
     "vue-cookie": "1.1.4",
+    "vue-quill-editor": "^3.0.6",
+    "vue-quill-editor-upload": "^1.1.0",
     "vue-router": "3.0.1",
     "vuex": "3.0.1"
   },

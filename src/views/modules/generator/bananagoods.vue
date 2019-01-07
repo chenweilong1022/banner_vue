@@ -45,7 +45,7 @@
         header-align="center"
         :formatter="formatterTopUpWay"
         align="center"
-        label="充值方式1:卡密2:自动充值3:手动充值">
+        label="充值方式">
       </el-table-column>
       <el-table-column
         prop="createTime"
@@ -58,7 +58,7 @@
         header-align="center"
         :formatter="formatterStatus"
         align="center"
-        label="0:正常 -1:下架 -2:删除">
+        label="状态">
       </el-table-column>
       <el-table-column
         fixed="right"
@@ -69,6 +69,8 @@
         <template slot-scope="scope">
           <el-button type="text" size="small" @click="addOrUpdateHandle(scope.row.goddsid)">修改</el-button>
           <el-button type="text" size="small" @click="deleteHandle(scope.row.goddsid)">删除</el-button>
+          <el-button v-if="scope.row.status == -1" type="text" size="small" @click="shelvesHandle(scope.row.goddsid)">上架</el-button>
+          <el-button v-if="scope.row.status == 0" type="text" size="small" @click="soldoutHandle(scope.row.goddsid)">下架</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -182,6 +184,72 @@
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
+        })
+      },
+      //上架
+      shelvesHandle (id) {
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.goddsid
+        })
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '上架' : '批量上架'}]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/generator/bananagoods/update'),
+            method: 'post',
+            data: this.$http.adornData({
+                'goddsid': id,
+                'status': 0
+              })
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        })
+      },
+      //下架
+      soldoutHandle (id) {
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.goddsid
+        })
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '下架' : '批量下架'}]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/generator/bananagoods/update'),
+            method: 'post',
+            data: this.$http.adornData({
+                'goddsid': id,
+                'status': -1
+              })
+          }).then(({data}) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
         })
       },
       // 删除
