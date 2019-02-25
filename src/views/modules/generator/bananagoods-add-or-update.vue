@@ -71,43 +71,11 @@
         <el-radio v-model="dataForm.status" label="-1">下架</el-radio>
     </el-form-item>
 
-    <el-form-item label="状态" prop="status">
-
-
-  <div class="mod-demo-ueditor">
-    <el-alert
-      title="提示："
-      type="warning"
-      :closable="false">
-      <div slot-scope="description">
-        <p class="el-alert__description">1. 此Demo只提供UEditor官方使用文档，入门部署和体验功能。具体使用请参考：http://fex.baidu.com/ueditor/</p>
-        <p class="el-alert__description">2. 浏览器控制台报错“请求后台配置项http错误，上传功能将不能正常使用！”，此错需要后台提供上传接口方法（赋值给serverUrl属性）</p>
+    <el-form-item label="步骤描述" prop="status">
+      <div class="mod-demo-ueditor">
+        <script :id="ueId" class="ueditor-box" type="text/plain" style="width: 100%; height: 260px;">{{dataForm.stepsStr}}</script>
       </div>
-    </el-alert>
-
-    <script :id="ueId" class="ueditor-box" type="text/plain" style="width: 100%; height: 260px;">hello world!</script>
-    
-    <!-- 获取内容 -->
-    <p><el-button @click="getContent()">获得内容</el-button></p>
-    <el-dialog
-      title="内容"
-      :visible.sync="dialogVisible"
-      :append-to-body="true">
-      {{ ueContent }}
-      <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
-  </div>
-
-
-
     </el-form-item>
-
-
-
-
-
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -179,7 +147,8 @@
           shareUrl: '',
           shareTitle: '',
           shareDesc: '',
-          prompt: ''
+          prompt: '',
+          stepsStr: ''
         },
         dataRule: {
           title: [
@@ -204,20 +173,21 @@
       }
     },
     mounted() {
-      setInterval(this.timer, 5000);
+      setTimeout(this.timer, 1000);
     },
     methods: {
       timer() {
         console.log(this.url)
         this.ue = ueditor.getEditor(this.ueId, {
-          serverUrl: this.url, // 服务器统一请求接口路径
+          serverUrl: this.$http.adornUrl(`/file/config?token=${this.$cookie.get('token')}`), //服务器统一请求接口路径
           zIndex: 3000
         })
       },
-      getUEContent() { // 获取内容方法
-        return this.editor.getContent()
+      getContent () {
+        return this.ue.getContent()
       },
       init (id) {
+        this.dataForm.stepsStr = ''
         this.url = this.$http.adornUrl(`/file/upload?token=${this.$cookie.get('token')}`)
         this.dataForm.goddsid = id || 0
         this.visible = true
@@ -242,10 +212,12 @@
                 this.dataForm.shareTitle = data.bananaGoods.shareTitle
                 this.dataForm.shareDesc = data.bananaGoods.shareDesc
                 this.dataForm.prompt = data.bananaGoods.prompt
+                this.dataForm.stepsStr = data.bananaGoods.stepsStr
               }
             })
           }
         })
+        console.log(this.dataForm)
       },
       handleAvatarSuccess(res, file) {
         this.dataForm.pic = res.data
@@ -257,6 +229,7 @@
       dataFormSubmit () {
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
+            this.dataForm.stepsStr = this.getContent()
             this.$http({
               url: this.$http.adornUrl(`/generator/bananagoods/${!this.dataForm.goddsid ? 'save' : 'update'}`),
               method: 'post',
@@ -273,7 +246,8 @@
                 'shareUrl': this.dataForm.shareUrl,
                 'shareTitle': this.dataForm.shareTitle,
                 'shareDesc': this.dataForm.shareDesc,
-                'prompt': this.dataForm.prompt
+                'prompt': this.dataForm.prompt,
+                'stepsStr': this.dataForm.stepsStr
               })
             }).then(({data}) => {
               if (data && data.code === 0) {
@@ -292,10 +266,7 @@
             })
           }
         })
-      }
+      },
     },
-    destroyed() {
-      this.editor.destroy();
-    }
   }
 </script>

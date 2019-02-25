@@ -3,7 +3,7 @@
     :title="!dataForm.id ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @submit.enter.native="dataFormSubmit()" label-width="80px">
     <el-form-item label="商品id" prop="goodsId">
         <el-select v-model="dataForm.goodsId" placeholder="请选择">
           <el-option
@@ -14,9 +14,21 @@
           </el-option>
         </el-select>
     </el-form-item>
-    <el-form-item label="卡密" prop="camilo">
+    <el-form-item v-if="dataForm.id" label="卡密" prop="camilo">
       <el-input v-model="dataForm.camilo" placeholder="卡密"></el-input>
     </el-form-item>
+
+    <el-form-item v-if="!dataForm.id" label="卡密" prop="textarea">
+      <el-input
+        type="textarea"
+        :rows="10"
+        placeholder="请输入内容"
+        v-model="dataForm.textarea">
+      </el-input>
+    </el-form-item>
+      <el-input
+        type="hidden">
+      </el-input>
    <!-- <el-form-item label="状态0:未发放1:已发放" prop="status">
       <el-input v-model="dataForm.status" placeholder="状态0:未发放1:已发放"></el-input>
     </el-form-item>
@@ -43,7 +55,8 @@
         dataForm: {
           id: 0,
           goodsId: '',
-          camilo: ''
+          camilo: '',
+          textarea: ''
         },
         dataRule: {
           goodsId: [
@@ -97,7 +110,8 @@
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
                 'goodsId': this.dataForm.goodsId,
-                'camilo': this.dataForm.camilo
+                'camilo': this.dataForm.camilo,
+                'textarea': this.dataForm.textarea
               })
             }).then(({data}) => {
               if (data && data.code === 0) {

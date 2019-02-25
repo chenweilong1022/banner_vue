@@ -100,6 +100,13 @@
         label="用户">
       </el-table-column>
       <el-table-column
+        prop="status"
+        header-align="center"
+        align="center"
+        :formatter="formatterStatus"
+        label="是否已经充值">
+      </el-table-column>
+      <el-table-column
         fixed="right"
         header-align="center"
         align="center"
@@ -196,6 +203,19 @@
             case 3:
             return '手动充值';
             break;
+        }
+      },
+      formatterStatus(row, column) {
+        switch(row.status){
+            case 0:
+            return '未充值';
+            break;
+
+            case 1:
+            return '已经充值';
+            break;
+
+
         }
       },
       formatterPayType(row, column) {
